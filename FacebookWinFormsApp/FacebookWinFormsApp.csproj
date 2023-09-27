@@ -92,9 +92,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Album.cs" />
-    <Compile Include="ChangeControlStrategy.cs" />
-    <Compile Include="ControlComponentsCollection.cs" />
-    <Compile Include="ControlPropertyChanger.cs" />
+    <Compile Include="AlbumDataLoader.cs" />
+    <Compile Include="AlbumsIterator.cs" />
+    <Compile Include="ButtonCollection.cs" />
+    <Compile Include="ChangeButtonStrategy.cs" />
+    <Compile Include="ClickedColorStrategy.cs" />
+    <Compile Include="ButtonPropertyChanger.cs" />
     <Compile Include="DesignedForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,6 +120,7 @@
     <Compile Include="ListForm.Designer.cs">
       <DependentUpon>ListForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="LoadDataTamplateMethod.cs" />
     <Compile Include="LoginResultProxy.cs" />
     <Compile Include="NewPostForm.cs">
       <SubType>UserControl</SubType>
@@ -125,8 +129,12 @@
       <DependentUpon>NewPostForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Post.cs" />
+    <Compile Include="InterfaceIterator.cs" />
+    <Compile Include="PostDataLoader.cs" />
+    <Compile Include="PostIterator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnClickedColorStrategy.cs" />
     <EmbeddedResource Include="DesignedForm.resx">
       <DependentUpon>DesignedForm.cs</DependentUpon>
       <SubType>Designer</SubType>

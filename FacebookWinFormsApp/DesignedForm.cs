@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using System.Xml;
 using System.Xml.Linq;
 using CefSharp.DevTools.CSS;
@@ -25,6 +26,12 @@ namespace BasicFacebookFeatures
     {
         private LoginResultProxy m_LoginResultProxy;
         private IFactory factory;
+        private InterfaceIterator<Post> m_PostIterator;
+        private InterfaceIterator<Album> m_AlbumIterator;
+
+        private List<Post> m_Posts = new List<Post>();
+        private List<Album> m_AlbumsWithLinks = new List<Album>();
+        private List<Group> m_Groups = new List<Group>();
 
         public DesignedForm()
         {
@@ -32,11 +39,9 @@ namespace BasicFacebookFeatures
             postsListBox.BringToFront();
             FacebookWrapper.FacebookService.s_CollectionLimit = 25;
             factory = FacebookFactory.Instance;
+            m_PostIterator = new PostIterator(m_Posts);
+            m_AlbumIterator = new AlbumsIterator(m_AlbumsWithLinks);
         }
-
-        private List<Post> m_Posts = new List<Post>();
-        private List<Album> m_AlbumsWithLinks = new List<Album>();
-        private List<Group> m_Groups = new List<Group>();
 
         private void LoginButton_Click(object sender, EventArgs e)
         {
@@ -82,16 +87,16 @@ namespace BasicFacebookFeatures
                     genderLable.Text = $"Gender: {m_LoginResultProxy.GetLoginResult().LoggedInUser.Gender}";
                     loginButton.BackColor = Color.LightGreen;
                     profilePictureBox.ImageLocation = m_LoginResultProxy.GetLoginResult().LoggedInUser.PictureNormalURL;
-                    this.Controls.EnableAll();
-                    //postsButton.Enabled = true;
-                    //albumsButton.Enabled = true;
-                    //groupsButton.Enabled = true;
-                    //newPostButton.Enabled = true;
-                    //mostLikedButton.Enabled = true;
-                    //numberOfPhotosButton.Enabled = true;
+                    postsButton.EnableButton();
+                    postsButton.EnableButton();
+                    albumsButton.EnableButton();
+                    groupsButton.EnableButton();
+                    newPostButton.EnableButton();
+                    mostLikedButton.EnableButton();
+                    numberOfPhotosButton.EnableButton();
                     textBoxAppID.Enabled = false;
                     loginButton.Enabled = false;
-                    //logoutButton.Enabled = true;
+                    logoutButton.EnableButton();
                 }
                 else
                 {
@@ -120,7 +125,7 @@ namespace BasicFacebookFeatures
                 mostLikedButton.Enabled = false;
                 numberOfPhotosButton.Enabled = false;
                 textBoxAppID.Enabled = true;
-                loginButton.Enabled = true;
+                loginButton.EnableButton();
                 logoutButton.Enabled = false;
                 postsListBox.BringToFront();
             }
@@ -128,22 +133,25 @@ namespace BasicFacebookFeatures
 
         private void PostsButton_Click(object sender, EventArgs e)
         {
+            postsButton.ClickedColorButton();
             Thread thread = new Thread(() =>
             {
                 postsButton.Enabled = false;
                 if (m_Posts.Count == 0)
                 {
-                    SetPosts(postsListBox.GetListBox, m_LoginResultProxy.GetLoginResult());
+                    LoadDataTemplateMethod loader = new PostDataLoader(this);
+                    loader.Load(postsListBox.GetListBox, m_LoginResultProxy.GetLoginResult());
                 }
 
                 postsListBox.SetPosts = m_Posts;
                 this.Invoke(new Action(() =>
                 {
-                    numberOfPhotosButton.Enabled = true;
-                    newPostButton.Enabled = true;
-                    albumsButton.Enabled = true;
-                    groupsButton.Enabled = true;
-                    mostLikedButton.Enabled = true;
+                    numberOfPhotosButton.EnableButton();
+                    newPostButton.EnableButton();
+                    albumsButton.EnableButton();
+                    groupsButton.EnableButton();
+                    mostLikedButton.EnableButton();
+                    postsButton.unClickedColorButton();
                 }));
             });
 
@@ -153,22 +161,25 @@ namespace BasicFacebookFeatures
 
         private void AlbumsButton_Click(object sender, EventArgs e)
         {
+            albumsButton.ClickedColorButton();
             Thread thread = new Thread(() =>
             {
                 albumsButton.Enabled = false;
                 if (m_AlbumsWithLinks.Count == 0)
                 {
-                    LoadAlbums(albumsListBox.GetListBox, m_LoginResultProxy.GetLoginResult());
+                    LoadDataTemplateMethod loader = new AlbumDataLoader(this);
+                    loader.Load(albumsListBox.GetListBox, m_LoginResultProxy.GetLoginResult());
                 }
 
                 albumsListBox.SetAlbums = m_AlbumsWithLinks;
                 this.Invoke(new Action(() =>
                 {
-                    numberOfPhotosButton.Enabled = true;
-                    newPostButton.Enabled = true;
-                    groupsButton.Enabled = true;
-                    postsButton.Enabled = true;
-                    mostLikedButton.Enabled = true;
+                    numberOfPhotosButton.EnableButton();
+                    newPostButton.EnableButton();
+                    groupsButton.EnableButton();
+                    postsButton.EnableButton();
+                    mostLikedButton.EnableButton();
+                    albumsButton.unClickedColorButton();
                 }));
             });
             thread.Start();
@@ -177,6 +188,7 @@ namespace BasicFacebookFeatures
 
         private void GroupsButton_Click(object sender, EventArgs e)
         {
+            groupsButton.ClickedColorButton();
             Thread thread = new Thread(() =>
             {
                 groupsButton.Enabled = false;
@@ -187,11 +199,12 @@ namespace BasicFacebookFeatures
 
                 this.Invoke(new Action(() =>
                 {
-                    numberOfPhotosButton.Enabled = true;
-                    newPostButton.Enabled = true;
-                    albumsButton.Enabled = true;
-                    postsButton.Enabled = true;
-                    mostLikedButton.Enabled = true;
+                    numberOfPhotosButton.EnableButton();
+                    newPostButton.EnableButton();
+                    albumsButton.EnableButton();
+                    postsButton.EnableButton();
+                    mostLikedButton.EnableButton();
+                    groupsButton.unClickedColorButton();
                 }));
             });
             thread.Start();
@@ -276,11 +289,11 @@ namespace BasicFacebookFeatures
         private void NewPostButton_Click(object sender, EventArgs e)
         {
             newPostButton.Enabled = false;
-            numberOfPhotosButton.Enabled = true;
-            groupsButton.Enabled = true;
-            albumsButton.Enabled = true;
-            postsButton.Enabled = true;
-            mostLikedButton.Enabled = true;
+            numberOfPhotosButton.EnableButton();
+            groupsButton.EnableButton();
+            albumsButton.EnableButton();
+            postsButton.EnableButton();
+            mostLikedButton.EnableButton();
             newPostInsideForm.LoginResult = m_LoginResultProxy.GetLoginResult();
             newPostInsideForm.BringToFront();
         }
@@ -293,11 +306,11 @@ namespace BasicFacebookFeatures
             }
 
             mostLikedButton.Enabled = false;
-            numberOfPhotosButton.Enabled = true;
-            postsButton.Enabled = true;
-            newPostButton.Enabled = true;
-            albumsButton.Enabled = true;
-            groupsButton.Enabled = true;
+            numberOfPhotosButton.EnableButton();
+            postsButton.EnableButton();
+            newPostButton.EnableButton();
+            albumsButton.EnableButton();
+            groupsButton.EnableButton();
             lableBoxesFirst.BringToFront();
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("The most liked Post is: ");
@@ -326,19 +339,18 @@ namespace BasicFacebookFeatures
         public Post GetMostLikedPost(List<Post> i_Posts)
         {
             List<string> empty = new List<string>();
-
             Post currentPost = factory.CreatePost(string.Empty, "0", empty);
             if (i_Posts != null)
             {
                 currentPost = i_Posts[0];
                 int maxlikes = 0;
-                foreach (Post post in i_Posts)
+                while (m_PostIterator.HasNext())
                 {
-                    int currentPostLikes = int.Parse(post.Likes);
+                    int currentPostLikes = int.Parse(m_PostIterator.Next().Likes);
                     if (maxlikes < currentPostLikes)
                     {
                         maxlikes = currentPostLikes;
-                        currentPost = post;
+                        currentPost = m_PostIterator.Next();
                     }
                 }
             }
@@ -354,11 +366,11 @@ namespace BasicFacebookFeatures
             }
 
             numberOfPhotosButton.Enabled = false;
-            mostLikedButton.Enabled = true;
-            postsButton.Enabled = true;
-            newPostButton.Enabled = true;
-            albumsButton.Enabled = true;
-            groupsButton.Enabled = true;
+            mostLikedButton.EnableButton();
+            postsButton.EnableButton();
+            newPostButton.EnableButton();
+            albumsButton.EnableButton();
+            groupsButton.EnableButton();
             numberOfPhotosLableForm.BringToFront();
             string totalNumberOfPhotos = GetTotalNumberOfPhotos(m_AlbumsWithLinks);
             numberOfPhotosLableForm.GetLabel.Text = $"The total number of photos is: {totalNumberOfPhotos}";
@@ -369,9 +381,9 @@ namespace BasicFacebookFeatures
             long? totalNumberOfPhotos = 0;
             if (i_Albums != null)
             {
-                foreach (Album album in i_Albums)
+                while (m_AlbumIterator.HasNext())
                 {
-                    long? currentAlbumPhotos = album.NumberOfPhotos;
+                    long? currentAlbumPhotos = m_AlbumIterator.Next().NumberOfPhotos;
                     totalNumberOfPhotos += currentAlbumPhotos;
                 }
             }

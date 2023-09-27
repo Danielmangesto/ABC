@@ -396,5 +396,6 @@
         private LabelForm lableBoxesFirst;
         private System.Windows.Forms.Button numberOfPhotosButton;
         private LabelForm numberOfPhotosLableForm;
+
     }
 }

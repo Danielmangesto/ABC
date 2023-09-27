@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Ignore Spelling: Facebook
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +9,8 @@ using System.Windows.Forms;
 
 namespace BasicFacebookFeatures
 {
-    public interface IChangeControlStrategy
+    public interface IChangeButtonStrategy
     {
-        void ChangeProperty(Control i_Control);
+        void ChangeProperty(Button i_Button);
     }
 }

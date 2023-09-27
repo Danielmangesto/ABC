@@ -37,5 +37,10 @@ namespace BasicFacebookFeatures
             get { return m_Comments; }
             set { m_Comments = value; }
         }
+
+        public InterfaceIterator<Post> GetIterator()
+        {
+            return new PostIterator(new List<Post> { this });
+        }
     }
 }
